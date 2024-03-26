@@ -1,0 +1,35 @@
+﻿
+@using NBP_I_PROJEKAT.Models
+@using NBP_I_PROJEKAT.Controllers
+@model List<Objava>
+
+<div class="container">
+    <div class="row main-row d-flex justify-content-center">
+        @if (Model.Count > 0)
+            {
+
+            foreach (var o in Model)
+            {
+                <div class="col-3 mt-2 d-flex justify-content-center">
+                    <div class="card card-shadow" style="width: 18rem;">
+                        <div class="card-body" style="background-color: wheat;">
+                            <h5 class="card-title">@o.Naziv</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Tag: @o.Tag</h6>
+                            <p class="card-text">Sadrzaj: @o.Sadrzaj</p>
+                         
+                            <a asp-controller="Home" asp-action="PrikaziPojedinacneObjaveKorisnika" asp-route-objavaId="@o.Id" class="card-link">Otvori</a>
+                            <a asp-controller="Home" asp-action="LajkujObjavuKorisnika" asp-route-objavaID="@o.Id" class="card-link">Oznaci svidjanje</a>
+                           
+                        </div>
+                    </div>
+                </div>
+            }
+            
+            }
+            else
+            {
+                <p>Nemate Objave</p>
+            }
+    </div>
+    
+</div>

@@ -1,0 +1,42 @@
+﻿﻿body {
+    background-color: rgb(97, 97, 97);
+}
+
+.category-col,
+.leaderboard-col {
+    margin-top: 8px;
+}
+
+.main-row .col-4 {
+    margin: 8px 0;
+}
+
+.card-shadow {
+    box-shadow: 0 6px 8px #0009;
+}
+
+.chat-user-link:hover {
+    text-decoration: none;
+}
+
+.my-message > .card,
+.room-item[selected] {
+    background-color: rgba(139, 139, 139, 0.6) !important;
+}
+
+.my-message {
+    justify-content: flex-end;
+}
+
+.nav-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.add-ad-btn {
+    width: 80px;
+    height: 64px;
+    position: fixed;
+    bottom: 40px;
+    right: 48px;
+}

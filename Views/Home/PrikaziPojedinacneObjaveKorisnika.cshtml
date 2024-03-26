@@ -1,0 +1,131 @@
+﻿
+@using Microsoft.AspNetCore.Http
+@using NBP_I_PROJEKAT.Session
+@using NBP_I_PROJEKAT.Models
+@model Objava
+
+@{
+
+
+    int userId = ViewContext.HttpContext.Session.GetInt32(SessionKeys.UserId) ?? -1;
+    string id = userId.ToString();
+    var idObjave = ViewContext.HttpContext.Request.Query.Count > 0 ? ViewContext.HttpContext.Request.Query["objavaId"].FirstOrDefault() : "";
+
+    bool nadjen;
+
+    if (Model.Korisnik != null && Model.Korisnik.Pratioci != null)
+    {
+        nadjen = Model.Korisnik.Pratioci.Contains(userId);
+    }
+    else
+    {
+        nadjen = false;
+    }
+}
+
+
+<div class="container mt-5">
+    <div class="row main-row">
+        <div class="col-12 d-flex justify-content-center">
+            <div class="card card-shadow" style="width: 24rem;">
+                <div class="card-header">
+                    <h4 class="card-title">Objava: @Model.Naziv</h4>
+                </div>
+                
+        
+                <div class="card-body">
+                    <h6 class="card-title" style="font-size:larger; ">Tag: #@Model.Tag</h6>
+                    <h6 class="card-title ">Kratak opis objave: </h6>
+                    <h6 class="card-text">@Model.Sadrzaj</h6>
+                    @if (Model.Korisnik != null)
+                    {
+                        <div>
+                            <label class="card-title">Vlasnik oglasa: @Model.Korisnik.KorisnickoIme</label>
+                            @if (!nadjen)
+                            {
+                                <a class="nav-link" asp-controller="Home" asp-action="ZapratiKorisnika" asp-route-uId="@Model.Korisnik.ID">Zaprati korisnika koji je objavio ovu objavu</a>
+                            }
+                            else
+                            {
+                                <a class="nav-link" asp-controller="Home" asp-action="OtpratiKorisnika" asp-route-uId="@Model.Korisnik.ID">Otprati korisnika koji je objavio ovu objavu</a>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="row chat-row overflow-auto" style="height: 73vh;">
+                    <div class="container-fluid" id="messages-container">
+                        @{
+                            if (Model.Poruke is not null)
+                                foreach (var msg in Model.Poruke)
+                                {
+                                    <div class="row m-4 d-flex @(msg.Od == ViewContext.HttpContext.Session.GetInt32(SessionKeys.UserId) ? "my-message" : "")">
+                                        <div class="card bg-primary" style="width: 30rem;">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@msg.KorisnickoIme</h5>
+                                                <p class="card-text">@msg.Sadrzaj</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 border-top border-dark">
+                        <div class="input-group mt-3">
+                            <input type="text" id="message" class="form-control" placeholder="Poruka" aria-label="Poruka" aria-describedby="basic-addon2" style="height:50px">
+                            <div class="input-group-append">
+                                <button id="submitMessage" class="btn btn-success" type="button">Pošalji</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>const chatRow = document.querySelector('.chat-row');
+    chatRow.scrollTop = chatRow.scrollHeight;</script>
+
+<script>
+	var connection = new signalR.HubConnectionBuilder().withUrl("/hub/Chat").build()
+
+	connection.on("MessageReceived", (data) => {
+		const { Od, KorisnickoIme, Sadrzaj} = JSON.parse(data)
+
+
+		var comment = `<div class="row m-4 d-flex ${(Od == @ViewContext.HttpContext.Session.GetInt32(SessionKeys.UserId) ? "my-message" : "")}">
+										<div class="card bg-primary" style="width: 30rem;">
+											<div class="card-body">
+												<h5 class="card-title">${KorisnickoIme}</h5>
+												<p class="card-text">${Sadrzaj}</p>
+											</div>
+										</div>
+									</div>`
+
+		$("#messages-container").append(comment);
+		const chatRow = document.querySelector('.chat-row');
+		chatRow.scrollTop = chatRow.scrollHeight;
+	});
+
+    connection.start().then(() => {
+        connection.invoke("Subscribe", '@idObjave').catch(function (err) {
+			return console.error(err.toString());
+		});
+	}).catch((err) => {
+		console.log(err)
+	});
+
+	$("#submitMessage").click(() => {
+		var message = $("#message").val()
+
+        connection.invoke("SaljiPoruku", '@idObjave', message).catch(function (err) {
+			return console.error(err.toString());
+		});
+		event.preventDefault();
+
+		$("#message").val('')
+	});
+</script>
+

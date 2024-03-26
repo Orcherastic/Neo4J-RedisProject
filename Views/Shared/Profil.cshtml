@@ -1,0 +1,110 @@
+﻿
+@using NBP_I_PROJEKAT.Models
+@model Korisnik
+
+
+<div class="container">
+    <div class="row main-row d-flex justify-content-center">
+        <div class="col-6 mt-4">
+
+
+            <table class="table table-striped bg-light">
+                <tbody>
+                    <tr>
+                        <th scope="row">Korisničko ime:</th>
+                        <td>@Model.KorisnickoIme</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email:</th>
+                        <td>@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fakultet:</th>
+                        <td>@Model.Fakultet</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Smer:</th>
+                        <td>@Model.Smer</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Godina studija:</th>
+                        <td>@Model.GodinaStudije</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Izmenite podatke:</th>
+                        <td>
+                            <button class="btn btn-primary" onclick="@($"OpenModalPopUp('{Model.ID}', '{Model.KorisnickoIme}', '{Model.Email}', '{Model.Fakultet}', '{Model.Smer}', '{Model.GodinaStudije}',  '{Model.Sifra}')");">Izmeni</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="changeProfile" tabindex="-1" role="dialog" aria-labelledby="changeModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeModalLongTitle">Izmeni profil</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" name="id" class="form-control" id="id">
+                    <div class="form-group">
+                        <label for="KorisnickoIme">Korisnicko Ime</label>
+                        <input type="text" name="KorisnickoIme" class="form-control" id="KorisnickoIme">
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="Email">Email</label>
+                        <input type="text" name="Email" class="form-control" id="Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="Fakultet">Fakultet</label>
+                        <input type="text" name="Fakultet" class="form-control" id="Fakultet">
+                    </div>
+                    <div class="form-group">
+                        <label for="Smer">Smer</label>
+                        <input type="text" name="Smer" class="form-control" id="Smer">
+                    </div>
+                    <div class="form-group">
+                        <label for="GodinaStudije">Godina Studija:</label>
+                        <input type="text" name="GodinaStudije" class="form-control" id="GodinaStudije">
+                    </div>
+                    <div class="form-group">
+                        <label for="Sifra">Lozinka</label>
+                        <input type="password" name="Sifra" class="form-control" id="Sifra" placeholder="Lozinka">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password-confirm">Ponovite lozinku</label>
+                        <input type="password" name="repassword" class="form-control" id="password-confirm" placeholder="Ponovite lozinku">
+                    </div>
+                    <button type="submit" class="btn btn-success" asp-action="PromeniPodatke" method="post" asp-controller="Home">Izmeni</button>
+                    <button type="submit" class="btn btn-danger" asp-action="Profil" asp-controller="Objava">Odustani</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function OpenModalPopUp(id, username, email, fakultet, smer, godinaStudije,sifra) {
+        let strId = id.toString();
+        $('#id').val(strId);
+        $('#username').val(username);
+        $('#password1').val(sifra);
+        $('#email').val(email);
+        $('#fakultet').val(fakultet);
+        $('#smer').val(smer);
+        $('#godinaStudije').val(godinaStudije);
+        $("#changeProfile").modal();
+    }
+</script>

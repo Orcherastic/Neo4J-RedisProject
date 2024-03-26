@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]  STU(DYING)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" />
+</head>
+
+@using Microsoft.AspNetCore.Http;
+@using NBP_I_PROJEKAT.Session;
+@{
+    int userId = ViewContext.HttpContext.Session.GetInt32(SessionKeys.UserId) ?? -1;
+    bool isLoged = userId >= 0;
+}
+<body style="background-color:darkslateblue">
+    <header>
+        <div class="h123" style="background-color: darkblue;">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark;">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button><a class="text-light" asp-controller="Home" asp-action="Index">STU(DYING)</a>             <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        @*<li class="nav-item active"><a class="nav-link" asp-controller="Home" asp-action="Index">Objave<span class="sr-only">(current)</span></a></li>*@
+                        @if (isLoged)
+                        {
+                            <div class="card-body" style="justify-content:flex-start">
+
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="MojeObjave">Moje objave</a></li>
+
+                    </div>
+                }
+                        </ul>
+                        <ul class="navbar-nav my-2 my-lg-0">
+                            @if (!isLoged)
+                            {
+
+                                <li class="nav-item"><a class="nav-link" href="Home/Login">Prijavi se</a></li>
+
+                                <li class="nav-item"><a class="nav-link" href="Home/Register">Registruj se</a></li>
+
+                            }
+                            else
+                            {
+
+                                <li class="nav-item">
+                                    <a class="nav-link" style="display:flex;" href="#" data-toggle="modal" data-target="#addModal">
+                                        <p class="dodaj" >Dodaj novu objavu</p>
+                                        <img id="add-new" class="nav-icon"  style="margin-left:10px;"  src="~/img/add.png" />
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Objava" asp-action="Profil">
+                                        <img class="nav-icon" src="~/img/man.png" />
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-toggle="modal" data-target="#notificationModal">
+                                        <img id="notification-bell" class="nav-icon" src="~/img/bell.png" />
+                                    </a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Odjava">Odjavi se</a></li>
+                            }
+                        </ul>
+                </div>
+                </nav>
+                </div>
+            </header>
+
+            <script src="~/js/signalr/dist/browser/signalr.js"></script>
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+
+            @RenderBody()
+            <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="objavaModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="objavaModalLongTitle">Postavi objavu</h5>
+                           
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" asp-action="DodajObjavu" asp-controller="Objava">
+                                <div class="form-group">
+                                    <label for="Naziv">Naziv</label>
+                                    <input type="text" name="naziv" class="form-control" id="objava-naziv" placeholder="Naziv">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Tag">Tag</label>
+                                    <input type="text" name="Tag" class="form-control" id="Tag" placeholder="Tag">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Sadrzaj">Sadrzaj objave</label>
+                                    <input type="text" name="Sadrzaj" class="form-control" id="Sadrzaj" placeholder="Sadrzaj">
+                                </div>
+                                <button id="submit-objava" type="submit" class="btn btn-primary">Postavi objavu</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="notificationModalLongTitle">Notifikacije</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="notification-container" class="container">
+                                @{
+                                    int id = 0;
+                                }
+                                @foreach (string notification in NBP_I_PROJEKAT.RedisManager<string>.GetAll($"korisnici:{userId}:notifikacije"))
+                                {
+                                    string[] temp = notification.Split('|');
+                                    if (temp.Length < 2)
+                                        continue;
+                                    <div id="not-@id" class="row">
+                                        <div class="col-8"><h6>@temp[0]</h6></div>
+                                        <div class="col-2"><a href="#" onclick="RemoveItem('@($"korisnici:{userId}:notifikacije")', '@notification', '#not-@(id++)')">Obrisi notifikaciju</a></div>
+                                        <div class="col-2">
+                                            <a asp-controller="Home" asp-action="PrikaziPojedinacneObjaveKorisnika" asp-route-objavaId='@(int.Parse(temp[1]))'>Otvori notifikaciju</a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+    var conn = new signalR.HubConnectionBuilder().withUrl("/hub/Objave").build()
+    conn.start().then(() => {
+    }).catch((err) => {
+        console.log(err)
+    });
+        conn.on('PrimljenaNotifikacija', (obj) => {
+            const { Pratioci, ObjavaId, ObjavaName, UserId, KorisnickoIme } = obj;
+            if (!Pratioci.find(x => '@userId'))
+            return
+            const notification = `${KorisnickoIme} kog pratite je postavio novu objavu -  ${ObjavaName}`
+            const url = `@(Url.Action("PrikaziPojedinacneObjaveKorisnika", "Home"))?objavaId='${parseInt(ObjavaId)}`;
+            const item = `<div id="not-@id" class="row">
+                            <div class="col-8"><h6></h6>${notification}</div>
+                            <div class="col-2"><a href="#" onclick="RemoveItem('@($"korisnici:{userId}:notifikacije")', '${notification}|${objavaId}', '#not-@(id++)')">X</a></div>
+                            <div class="col-2"><a href=${url}> Otvori</a></div>
+                          </div>`
+        $('#notification-container').append(item);
+        $('#notification-bell').attr('src', '/img/bell_notification.png')
+    });
+        $('#submit-objava').click(() => {
+            conn.invoke("PostaviObjavu", $('#objava-naziv').val()).catch(function (err) {
+            return console.error(err.toString());
+        })
+        conn.invoke("Subscribe", 'korisnik:0:pratioci').catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+    function RemoveItem(path, item, id)
+    {
+        $.ajax({
+            type: "DELETE",
+            url: '@Url.Action("ObrisiNotifikaciju", "Objava")',
+            data: {path, item},
+            success: () => {
+                $(id).remove();
+                if (document.getElementById('notification-container').childElementCount == 0)
+                    document.getElementById('notification-bell').src = '/img/bell.png';
+            },
+            error: () => {
+                alert("Something went wrong");
+            }
+        });
+    }</script>
+            <script>
+                if (document.getElementById('notification-container').childElementCount > 0)
+                    document.getElementById('notification-bell').src = '/img/bell_notification.png';</script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+            <script src="~/js/site.js" asp-append-version="true"></script>
+            @await RenderSectionAsync("Scripts", required: false)
+        </body>
+</html>

@@ -1,0 +1,45 @@
+﻿@page
+
+@*@{
+    ViewData["Title"] = "Stranica za registrovanje";
+}*@
+
+<div class="container d-flex" style="justify-content: center;">
+    <div class="card" style="width: 30rem;">
+        <div class="card-body">
+            <h5 class="card-title">Registruj se</h5>
+            <form asp-action="Registracija" asp-controller="Home">
+                <div class="form-group">
+                    <label for="username">Korisničko ime</label>
+                    <input type="text" name="KorisnickoIme" class="form-control" id="KorisnickoIme" placeholder="Korisničko ime">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email adresa</label>
+                    <input type="text" name="Email" class="form-control" id="Email" placeholder="Email adresa">
+                </div>
+                <div class="form-group">
+                    <label for="city">Fakultet</label>
+                    <input type="text" name="Fakultet" class="form-control" id="Fakultet" placeholder="Fakultet">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Smer</label>
+                    <input type="text" name="Smer" class="form-control" id="Smer" placeholder="Smer">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Godina studija</label>
+                    <input type="text" name="GodinaStudije" class="form-control" id="GodinaStudije" placeholder="Godina studija">
+                </div>
+                <div class="form-group">
+                    <label for="password">Lozinka</label>
+                    <input type="password" name="Sifra" class="form-control" id="Sifra" placeholder="Lozinka">
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm">Ponovite lozinku</label>
+                    <input type="password" class="form-control" id="password-confirm" placeholder="Ponovite lozinku">
+                </div>
+                <button type="submit" class="btn btn-primary">Registruj se</button>
+            </form>
+        </div>
+    </div>
+
+</div>
